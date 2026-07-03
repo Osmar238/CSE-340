@@ -2,7 +2,6 @@ import express from 'express';
 import { fileURLToPath } from 'url';
 import path from 'path';
 
-// 1. Inicializa las variables primero
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -17,7 +16,6 @@ const app = express();
 // Set EJS as the templating engine
 app.set('view engine', 'ejs');
 
-// 2. Ahora sí puedes usar __dirname sin que marque error
 // Tell Express where to find your templates
 app.set('views', path.join(__dirname, 'src/views'));
 
@@ -46,6 +44,11 @@ app.get('/organizations', async (req, res) => {
 app.get('/projects', async (req, res) => {
     const title = 'Service Projects';
     res.render('projects', { title });
+});
+
+app.get('/categories', async (req, res) => {
+    const title = 'Service Project Categories';
+    res.render('categories', { title });
 });
 
 app.listen(PORT, () => {
