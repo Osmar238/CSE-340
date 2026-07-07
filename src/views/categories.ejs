@@ -1,17 +1,16 @@
 <%- include('partials/header') %>
-
     <main>
         <h1><%= title %></h1>
+        <h2>Available Categories</h2>
         
-        <section>
-            <h2>Available Categories</h2>
-            <ul>
-                <li>Environmental</li>
-                <li>Educational</li>
-                <li>Community Service</li>
-                <li>Health and Wellness</li>
-            </ul>
-        </section>
+        <ul>
+            <% if (categories && categories.length > 0) { %>
+                <% categories.forEach(category => { %>
+                    <li><%= category.name %></li>
+                <% }) %>
+            <% } else { %>
+                <li>No categories found at this time.</li>
+            <% } %>
+        </ul>
     </main>
-
 <%- include('partials/footer') %>

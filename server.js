@@ -3,6 +3,8 @@ import { fileURLToPath } from 'url';
 import path from 'path';
 import { testConnection } from './src/models/db.js';
 import { getAllOrganizations } from './src/models/organizations.js';
+import * as projectsModel from './src/models/projects.js';
+import { getAllCategories } from './src/models/categories.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -38,21 +40,42 @@ app.get('/', async (req, res) => {
     res.render('home', { title });
 });
 
-app.get('/organizations', async (req, res) => {
-    const organizations = await getAllOrganizations();
-    const title = 'Our Partner Organizations';
-
-    res.render('organizations', { title, organizations });
+app.get('/projects', async (req, res) => {
+    try {
+        const title = 'Service Projects';
+        const projects = await projectsModel.getAllProjects();
+        console.log("Proyectos obtenidos de la BD:", projects);
+        res.render('projects', { title, projects }); 
+        
+    } catch (error) {
+        console.error("Error al cargar los proyectos:", error);
+        res.status(500).send("Error interno del servidor");
+    }
 });
 
-app.get('/projects', async (req, res) => {
-    const title = 'Service Projects';
-    res.render('projects', { title });
+app.get('/organizations', async (req, res) => {
+    try {
+        const title = 'Organizations';
+        const organizations = await getAllOrganizations();
+        console.log("Organizaciones obtenidas de la BD:", organizations);
+        res.render('organizations', { title, organizations });
+    } catch (error) {
+        console.error("Error al cargar las organizaciones:", error);
+        res.status(500).send("Error interno del servidor");
+    }
 });
 
 app.get('/categories', async (req, res) => {
-    const title = 'Service Project Categories';
-    res.render('categories', { title });
+    try {
+        const title = 'Service Project Categories';
+        const categories = await getAllCategories();
+        console.log("Categorías obtenidas de la BD:", categories);
+        res.render('categories', { title, categories });
+
+    } catch (error) {
+        console.error("Error al cargar las categorías:", error);
+        res.status(500).send("Error interno del servidor");
+    }
 });
 
 app.listen(PORT, async () => {
