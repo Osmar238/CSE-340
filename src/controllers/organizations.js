@@ -1,4 +1,5 @@
-import { getAllOrganizations } from '../models/organizations.js';
+import { getAllOrganizations, getOrganizationDetails } from '../models/organizations.js';
+// Y probablemente también necesites los proyectos de esa organización:
 import { getProjectsByOrganizationId } from '../models/projects.js';
 
 const organizationsPage = async (req, res) => {

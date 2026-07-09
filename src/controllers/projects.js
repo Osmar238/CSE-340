@@ -3,16 +3,32 @@ import * as projectsModel from '../models/projects.js';
 const projectsPage = async (req, res, next) => {
     try {
         const title = 'Service Projects';
-        // Aquí es donde Node.js lloraba porque no encontraba a projectsModel
         const projects = await projectsModel.getAllProjects(); 
-        console.log("Proyectos obtenidos de la BD:", projects);
         res.render('projects', { title, projects }); 
-        
     } catch (error) {
-        console.error("Error al cargar los proyectos:", error);
-        error.status = 500;
         next(error);
     }
 };
 
-export { projectsPage };
+const projectDetailPage = async (req, res, next) => {
+    try {
+        const projectId = req.params.id;
+        const project = await projectsModel.getProjectById(projectId);
+        
+        if (!project) {
+            const err = new Error('Project not found');
+            err.status = 404;
+            return next(err);
+        }
+
+        // Traemos las etiquetas de este proyecto
+        const categories = await projectsModel.getCategoriesByProjectId(projectId);
+
+        res.render('project', { title: project.title, project, categories });
+        
+    } catch (error) {
+        next(error);
+    }
+};
+
+export { projectsPage, projectDetailPage };
