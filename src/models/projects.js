@@ -68,3 +68,22 @@ export const getCategoriesByProjectId = async (projectId) => {
         throw error;
     }
 };
+
+// Traer los próximos "X" proyectos
+export const getUpcomingProjects = async (numberOfProjects) => {
+    try {
+        const query = `
+            SELECT sp.project_id, sp.title, sp.description, sp.location, sp.date, o.name AS organization_name
+            FROM service_projects sp
+            INNER JOIN organization o ON sp.organization_id = o.organization_id
+            WHERE sp.date >= CURRENT_DATE
+            ORDER BY sp.date ASC
+            LIMIT $1;
+        `;
+        const result = await db.query(query, [numberOfProjects]);
+        return result.rows;
+    } catch (error) {
+        console.error("Error al cargar los próximos proyectos:", error);
+        throw error;
+    }
+};

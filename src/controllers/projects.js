@@ -1,9 +1,13 @@
 import * as projectsModel from '../models/projects.js';
 
+const NUMBER_OF_UPCOMING_PROJECTS = 5;
+
 const projectsPage = async (req, res, next) => {
     try {
-        const title = 'Service Projects';
-        const projects = await projectsModel.getAllProjects(); 
+        const title = 'Upcoming Service Projects'; 
+        
+        const projects = await projectsModel.getUpcomingProjects(NUMBER_OF_UPCOMING_PROJECTS); 
+        
         res.render('projects', { title, projects }); 
     } catch (error) {
         next(error);
