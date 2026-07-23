@@ -3,6 +3,8 @@ import { fileURLToPath } from 'url';
 import path from 'path';
 import { testConnection } from './src/models/db.js';
 import router from './src/routes.js';
+import session from 'express-session';
+import flash from './src/middleware/flash.js';
 
 // Define the application environment
 const NODE_ENV = process.env.NODE_ENV?.toLowerCase() || 'production';
@@ -12,12 +14,28 @@ const PORT = process.env.PORT || 3000;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const SESSION_SECRET = process.env.SESSION_SECRET;
 
-const app = express();
+const app = express(); // ✅ 1. Primero nace la app
 
 /**
   * Configure Express middleware
   */
+
+// Set up session management
+app.use(session({      // ✅ 2. Luego configuras la sesión
+    secret: SESSION_SECRET,
+    resave: false,
+    saveUninitialized: true,
+    cookie: { maxAge: 60 * 60 * 1000 } 
+}));
+
+// Use flash message middleware
+app.use(flash);        // ✅ 3. Y ahora sí, configuras los mensajes flash
+
+// Allow Express to receive and process common POST data
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
 // Serve static files from the public directory
 app.use(express.static(path.join(__dirname, 'public')));
@@ -63,10 +81,12 @@ app.use((err, req, res, next) => {
     const template = status === 404 ? '404' : '500';
     
     // Prepare data for the template
+    // Prepare data for the template
     const context = {
         title: status === 404 ? 'Page Not Found' : 'Server Error',
         error: err.message,
-        stack: err.stack
+        stack: err.stack,
+        NODE_ENV: NODE_ENV  // <-- ¡Agrega esta línea!
     };
     
     // Render the appropriate error template

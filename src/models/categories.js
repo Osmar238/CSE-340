@@ -41,3 +41,25 @@ export const getProjectsByCategory = async (categoryId) => {
         throw error;
     }
 };
+
+export const assignCategoryToProject = async(categoryId, projectId) => {
+    const query = `
+        INSERT INTO project_categories (category_id, project_id)
+        VALUES ($1, $2);
+    `;
+    await db.query(query, [categoryId, projectId]);
+}
+
+export const updateCategoryAssignments = async(projectId, categoryIds) => {
+    // 1. Borrar las asignaciones viejas usando el nombre en plural
+    const deleteQuery = `
+        DELETE FROM project_categories
+        WHERE project_id = $1;
+    `;
+    await db.query(deleteQuery, [projectId]);
+
+    // 2. Agregar las nuevas asignaciones una por una
+    for (const categoryId of categoryIds) {
+        await assignCategoryToProject(categoryId, projectId);
+    }
+}
