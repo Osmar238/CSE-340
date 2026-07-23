@@ -19,7 +19,9 @@ import {
     // tus otras funciones...,
     showNewProjectForm, 
     processNewProjectForm, 
-    projectValidation 
+    projectValidation,
+    showEditProjectForm,
+    processEditProjectForm
 } from './controllers/projects.js';
 import { showAssignCategoriesForm, processAssignCategoriesForm } from './controllers/categories.js';
 
@@ -45,4 +47,8 @@ router.post('/new-project', projectValidation, processNewProjectForm);
 // Rutas para asignar categorías a un proyecto
 router.get('/assign-categories/:projectId', showAssignCategoriesForm);
 router.post('/assign-categories/:projectId', processAssignCategoriesForm);
+// Rutas para editar proyectos
+router.get('/edit-project/:id', showEditProjectForm);
+router.post('/edit-project/:id', projectValidation, processEditProjectForm);
+
 export default router;

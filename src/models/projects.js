@@ -108,3 +108,22 @@ export const createProject = async (title, description, location, date, organiza
 
     return result.rows[0].project_id;
 }
+
+export const updateProject = async (projectId, title, description, location, date, organizationId) => {
+    const query = `
+        UPDATE service_projects
+        SET title = $1, description = $2, location = $3, date = $4, organization_id = $5
+        WHERE project_id = $6
+        RETURNING project_id;
+    `;
+    
+    // El orden de los parámetros debe coincidir exactamente con los $1, $2...
+    const queryParams = [title, description, location, date, organizationId, projectId];
+    const result = await db.query(query, queryParams);
+
+    if (result.rows.length === 0) {
+        throw new Error('Failed to update project');
+    }
+
+    return result.rows[0].project_id;
+};

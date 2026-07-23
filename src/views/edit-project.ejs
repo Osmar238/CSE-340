@@ -1,0 +1,43 @@
+<%- include('partials/header') %>
+<main>
+    <h1><%= title %></h1>
+    
+    <form action="/edit-project/<%= project.project_id %>" method="POST">
+        <div class="form-group">
+            <label for="title">Project Title</label>
+            <input type="text" id="title" name="title" value="<%= project.title %>" maxlength="200" required />
+        </div>
+        
+        <div class="form-group">
+            <label for="description">Description</label>
+            <!-- El textarea no lleva atributo value, el texto va entre las etiquetas -->
+            <textarea id="description" name="description" maxlength="1000" required><%= project.description %></textarea>
+        </div>
+        
+        <div class="form-group">
+            <label for="location">Location</label>
+            <input type="text" id="location" name="location" value="<%= project.location %>" maxlength="200" required />
+        </div>
+        
+        <div class="form-group">
+            <label for="date">Date</label>
+            <!-- Aquí usamos la fecha que formateamos en el controlador -->
+            <input type="date" id="date" name="date" value="<%= formattedDate %>" required />
+        </div>
+        
+        <div class="form-group">
+            <label for="organizationId">Organization</label>
+            <select id="organizationId" name="organizationId" required>
+                <% organizations.forEach(org => { %>
+                    <!-- Comparamos el ID para seleccionar la opción correcta por defecto -->
+                    <option value="<%= org.organization_id %>" <%= org.organization_id === project.organization_id ? 'selected' : '' %>>
+                        <%= org.name %>
+                    </option>
+                <% }); %>
+            </select>
+        </div>
+        
+        <button type="submit">Update Project</button>
+    </form>
+</main>
+<%- include('partials/footer') %>

@@ -6,6 +6,8 @@ import { getAllOrganizations } from '../models/organizations.js';
 // Importamos el validador
 import { body, validationResult } from 'express-validator';
 
+import { updateProject } from '../models/projects.js';
+
 const projectValidation = [
     body('title')
         .trim()
@@ -94,4 +96,59 @@ const projectDetailPage = async (req, res, next) => {
     }
 };
 
-export { projectsPage, projectDetailPage, createProject, showNewProjectForm, processNewProjectForm, projectValidation };
+const showEditProjectForm = async (req, res, next) => {
+    try {
+        const projectId = req.params.id;
+        
+        // 1. Obtenemos el proyecto actual
+        const project = await projectsModel.getProjectById(projectId);
+        
+        if (!project) {
+            req.flash('error', 'Project not found.');
+            return res.redirect('/projects');
+        }
+
+        // 2. Obtenemos las organizaciones para el dropdown
+        const organizations = await getAllOrganizations();
+        
+        // 3. Formateamos la fecha para que el input type="date" de HTML5 la entienda (YYYY-MM-DD)
+        let formattedDate = '';
+        if (project.date) {
+            const d = new Date(project.date);
+            formattedDate = d.toISOString().split('T')[0]; 
+        }
+
+        const title = 'Edit Service Project';
+        res.render('edit-project', { title, project, formattedDate, organizations });
+        
+    } catch (error) {
+        next(error);
+    }
+};
+
+const processEditProjectForm = async (req, res, next) => {
+    const projectId = req.params.id;
+    
+    // Reutilizamos la validación que creaste en la actividad de insertar
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        errors.array().forEach((error) => {
+            req.flash('error', error.msg);
+        });
+        return res.redirect(`/edit-project/${projectId}`);
+    }
+
+    const { title, description, location, date, organizationId } = req.body;
+    
+    try {
+        await projectsModel.updateProject(projectId, title, description, location, date, organizationId);
+        req.flash('success', 'Project updated successfully!');
+        res.redirect(`/project/${projectId}`);
+    } catch (error) {
+        console.error('Error updating project:', error);
+        req.flash('error', 'There was an error updating the project.');
+        res.redirect(`/edit-project/${projectId}`);
+    }
+};
+
+export { projectsPage, projectDetailPage, createProject, showNewProjectForm, processNewProjectForm, projectValidation, showEditProjectForm, processEditProjectForm };
